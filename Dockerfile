@@ -7,10 +7,10 @@ FROM openjdk:8-jdk-alpine
 WORKDIR /app
 
 # Copy the application code to the container
-COPY /app2 /app
+COPY /app2 .
 
 # Compile the Java program
-RUN javac main.java
+RUN javac HelloWorld.java
 
 # Define the command to run the application
-CMD ["java", "main"]
+CMD ["java", "HelloWorld.java"]
