@@ -15,7 +15,6 @@ jobs:
     - name: Build the Docker image
       run: docker build . -t youssefmobarak/app2-docker-java:latest
     - name: snyk container test
-    - name: Run
         uses: snyk/actions/docker@master
         continue-on-error: ${{ inputs.snykContinueOnError == 'true' }}
         env:
