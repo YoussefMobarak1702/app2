@@ -13,7 +13,7 @@ jobs:
           args: --severity-threshold=high
   security2:
     runs-on: ubuntu-latest
-    needs: build
+    #needs: build
     name: Run the SCA scan on the source code
     steps:
       - uses: actions/checkout@master
@@ -24,7 +24,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
   zap_scan:
     runs-on: ubuntu-latest
-    needs: security
+    #needs: security
     name: Run DAST scan on the web application
     steps:
       - name: Checkout
