@@ -5,6 +5,12 @@ on:
 
 jobs:
 
+  secrets-scanner:
+    uses: https://github.com/YoussefMobarak1702/app2/actions/workflows/troufflehog.yaml
+    with:
+      extraArgs: ${{ inputs.trufflehogExtraArgs }}
+    secrets: inherit
+
   build:
 
     runs-on: ubuntu-latest
