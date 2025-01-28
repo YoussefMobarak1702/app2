@@ -6,7 +6,7 @@ on:
 jobs:
 
   secrets-scanner:
-    uses: https://github.com/YoussefMobarak1702/app2/actions/workflows/troufflehog.yaml@main
+    uses: https://github.com/YoussefMobarak1702/app2/.github/workflows/troufflehog.yaml@main
     with:
       extraArgs: ${{ inputs.trufflehogExtraArgs }}
     secrets: inherit
