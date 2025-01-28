@@ -2,11 +2,6 @@ name: Trufflehog scanner
 
 on:
   workflow_call:
-    inputs:
-      extraArgs:
-        description: 'Flags to be passed into the trufflehog command'
-        type: string
-        default: '--no-verification'
 
 jobs:
   secret-scan:
@@ -24,5 +19,4 @@ jobs:
         with:
           path: ./
           base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          extra_args: ${{ inputs.extraArgs }}
+          
