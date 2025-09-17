@@ -19,7 +19,7 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           output: 'trivy.txt'
-          severity: 'CRITICAL'
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
 
       - name: Publish Trivy Output to Summary
         run: |
