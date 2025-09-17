@@ -1,0 +1,47 @@
+name: Security & Secrets Scan
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  trivy-scan:
+    name: Trivy Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Trivy
+        uses: aquasecurity/trivy-action@v0.20.0
+
+      - name: Run Trivy on file system (repo)
+        uses: aquasecurity/trivy-action@v0.20.0
+        with:
+          scan-type: 'fs'
+          severity: 'CRITICAL'
+          exit-code: '1'
+          ignore-unfixed: true
+          format: 'table'
+
+  trufflehog-scan:
+    name: TruffleHog Secrets Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install TruffleHog
+        run: pip install trufflehog
+
+      - name: Run TruffleHog on PR diff
+        run: |
+          # Scan only changed files in the PR for speed, or use '.' for full repo scan
+          trufflehog filesystem --fail --json . > th_output.json
+          # Fail if TruffleHog found secrets
+          if [ -s th_output.json ]; then
+            cat th_output.json
+            echo "Potential secrets found!"
+            exit 1
+          fi
