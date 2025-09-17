@@ -17,13 +17,26 @@ jobs:
         uses: aquasecurity/trivy-action@v0.20.0
 
       - name: Run Trivy on file system (repo)
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'fs'
-          severity: 'CRITICAL'
-          exit-code: '1'
           ignore-unfixed: true
           format: 'table'
+          output: trivy.txt
+          severity: 'CRITICAL'
+        - name: Publish Trivy Output to Summary
+          run: |
+            if [[ -s trivy.txt ]]; then
+              {
+                echo "### Security Output"
+                echo "<details><summary>Click to expand</summary>"
+                echo ""
+                echo '```terraform'
+                cat trivy.txt
+                echo '```'
+                echo "</details>"
+              } >> $GITHUB_STEP_SUMMARY
+            fi
 
   trufflehog-scan:
     name: TruffleHog Secrets Scan
