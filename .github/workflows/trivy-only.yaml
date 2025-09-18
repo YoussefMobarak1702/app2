@@ -1,0 +1,55 @@
+name: trivy Scan
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  trivy-scan:
+    name: Trivy Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Trivy
+        uses: aquasecurity/trivy-action@v0.28.0
+
+      - name: Run Trivy (save table and JSON)
+        id: trivy_scan
+        uses: aquasecurity/trivy-action@v0.28.0
+        with:
+          scan-type: 'fs'
+          severity: 'CRITICAL'
+          exit-code: '0'
+          format: 'json'
+          output: 'trivy-results.json'
+
+      - name: Create markdown summary
+        run: |
+          echo "## Trivy Critical Vulnerabilities" >> $GITHUB_STEP_SUMMARY
+          COUNT=$(jq '.Results[].Vulnerabilities | map(select(.Severity=="CRITICAL")) | length' trivy-results.json | awk '{s+=\$1} END {print s}')
+          if [[ "$COUNT" -eq "0" ]]; then
+            echo "No critical vulnerabilities found. :white_check_mark:" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Target | Pkg | Version | Vulnerability ID | Title | Severity | Description |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-----|---------|------------------|-------|----------|-------------|" >> $GITHUB_STEP_SUMMARY
+            jq -r '.Results[]
+            | select(.Vulnerabilities)
+            | .Target as $target
+            | .Vulnerabilities[]
+            | select(.Severity=="CRITICAL")
+            | [ $target, .PkgName, .InstalledVersion, .VulnerabilityID, (.Title // "-"), .Severity, (.Description|gsub("\n";" ")|.[0:60]) ]
+            | @tsv' trivy-results.json | while IFS=$'\t' read -r target pkg ver vuln title sev desc; do
+              echo "| $$target | $$pkg | $$ver | $$vuln | $${title:0:20} | $$sev | $${desc:0:40}... |" >> $$GITHUB_STEP_SUMMARY
+            done
+          fi
+
+      - name: Fail if critical vulnerabilities found
+        run: |
+          COUNT=$(jq '.Results[].Vulnerabilities | map(select(.Severity=="CRITICAL")) | length' trivy-results.json | awk '{s+=\$1} END {print s}')
+          if [[ "$COUNT" -gt "0" ]]; then
+            echo "Critical vulnerabilities were found! See summary table above." >&2
+            exit 1
+          fi
