@@ -50,5 +50,5 @@ jobs:
 
         with:
           path: ./
-          base: ${{ github.event.repository.default_branch }}
+          base: ${{ github.event.pull_request.head.ref  }}
           head: HEAD
