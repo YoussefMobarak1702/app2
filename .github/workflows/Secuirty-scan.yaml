@@ -50,3 +50,15 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           extra_args: --results=verified,unknown
+      - name: Publish TruffleHog summary
+        run: |
+          echo '### TruffleHog Secrets Scan Results' >> $GITHUB_STEP_SUMMARY
+          if [ -s trufflehog_results.json ]; then
+            echo -e '\n\`\`\`json' >> $GITHUB_STEP_SUMMARY
+            cat trufflehog_results.json >> $GITHUB_STEP_SUMMARY
+            echo -e '\n\`\`\`' >> $GITHUB_STEP_SUMMARY
+            echo "Potential secrets found! Failing the job." >&2
+            exit 1
+          else
+            echo "No secrets found :white_check_mark:" >> $GITHUB_STEP_SUMMARY
+          fi
