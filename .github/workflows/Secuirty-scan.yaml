@@ -33,6 +33,8 @@ jobs:
               echo '```'
               echo "</details>"
             } >> $GITHUB_STEP_SUMMARY
+            echo "Critical and HIGH vulnerabilities were found! See summary table above." >&2
+            exit 1
           fi
   trufflehog-scan:
     name: TruffleHog Secrets Scan
@@ -40,11 +42,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: Install TruffleHog
-        run: pip install trufflehog
-
-      - name: Run TruffleHog on PR diff
-        uses: trufflesecurity/trufflehog@main
         with:
-          extra_args: --results=verified,unknown
+          fetch-depth: 0
+
+      - name: Run Trufflehog
+        uses: trufflesecurity/trufflehog@v3.86.1
+
+        with:
+          path: ./
+          base: ${{ github.event.pull_request.head.ref  }}
+          head: HEAD
