@@ -46,6 +46,11 @@ jobs:
       - name: Install TruffleHog
         run: pip install trufflehog
 
+      - name: TruffleHog scan for secrets/keys
+        run: |
+          set -e
+          trufflehog git --fail . | tee trufflehog_results.json
+
       - name: Run TruffleHog on PR diff
         uses: trufflesecurity/trufflehog@main
         with:
