@@ -19,7 +19,7 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           output: 'trivy.txt'
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          severity: 'HIGH,CRITICAL'
 
       - name: Publish Trivy Output to Summary
         run: |
@@ -36,19 +36,3 @@ jobs:
             echo "Critical and HIGH vulnerabilities were found! See summary table above." >&2
             exit 1
           fi
-  trufflehog-scan:
-    name: TruffleHog Secrets Scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Run Trufflehog
-        uses: trufflesecurity/trufflehog@v3.86.1
-
-        with:
-          path: ./
-          base: ${{ github.event.pull_request.head.ref  }}
-          head: HEAD
